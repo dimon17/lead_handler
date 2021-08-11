@@ -1,0 +1,36 @@
+{
+  "name": "dmitriy/lead_handler",
+  "description": "LeadHandler",
+  "minimum-stability": "dev",
+  "keywords": [
+    "LeadHandler"
+  ],
+  "authors": [
+    {
+      "name": "Osadchuk Dmitriy",
+      "email": "hondalom@gmail.com",
+      "role": "Main programmer"
+    }
+  ],
+  "require": {
+    "php": ">=7.4.21",
+    "ext-mbstring": "*",
+    "ext-iconv": "*",
+    "ext-json": "*",
+    "lib-pcre": "*",
+    "vladimir163/lead-generator": "dev-master"
+  },
+  "scripts": {
+  },
+  "config": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Application\\": "src/Application",
+      "Config\\": "src/Config",
+      "Tools\\": "src/Tools"
+    }
+  },
+  "repositories": [
+  ]
+}

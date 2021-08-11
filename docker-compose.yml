@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  php_cli:
+    build:
+      dockerfile: Dockerfile
+      context: ./docker/php_cli/build
+    container_name: php_cli
+    command: php LetsRoll.php
+    volumes:
+      - ./:/usr/src/application
+    working_dir: /usr/src/application
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "1000"
