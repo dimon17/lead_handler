@@ -13,18 +13,13 @@ error_reporting(E_ALL);
 
 $loader = require_once __DIR__ . '/vendor/autoload.php';
 
-
-
 use Application\App;
+use Tools\Math\NumbersConverter;
 
-function floor2($float, $decimals = 2)
-{
-    return floor($float * pow(10, $decimals)) / pow(10, $decimals);
-}
+if (getenv('DEV')) App::initialize(new Config\App\Dev);
+else App::initialize(new Config\App\Prod);
 
-//App::initialize(new Config\App\Dev);
-App::initialize(new Config\App\Prod);
 App::run();
 
-echo 'Time spent for all script: ' . floor2(microtime(true) - SCRIPT_STARTED_AT) . PHP_EOL;
+echo 'Time spent for all script: ' . NumbersConverter::floor(microtime(true) - SCRIPT_STARTED_AT) . PHP_EOL;
 exit();

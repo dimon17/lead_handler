@@ -6,6 +6,9 @@ services:
       dockerfile: Dockerfile
       context: ./docker/php_cli/build
     container_name: php_cli
+    environment:
+      - DEV=0
+#    command: bash -c "composer install && php LetsRoll.php"
     command: php LetsRoll.php
     volumes:
       - ./:/usr/src/application

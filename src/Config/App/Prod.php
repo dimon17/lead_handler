@@ -11,19 +11,7 @@ class Prod implements IAppConfig
     private static int $poolWorkersCount = 400;
     private static IWorkerBootstrap $workersBootstrap;
     private static int $leadsCount = 10000;
-    private static array $leadsAllowedCategories = [
-        'Buy auto',
-        'Buy house',
-        'Get loan',
-        'Cleaning',
-        'Learning',
-        'Car wash',
-        'Repair smth',
-        'Barbershop',
-        'Pizza',
-        'Car insurance',
-        'Life insurance'
-    ];
+    private static array $leadsAllowedCategories = [];
 
     public static function getPoolWorkersCount(): int
     {
@@ -43,6 +31,9 @@ class Prod implements IAppConfig
 
     public static function getLeadsAllowedCategories(): array
     {
+        # leads allowed categories may be changed while runtime
+        # (i know, that using DB will be more suitable for such things in future, but for simple example this is enough)
+        self::$leadsAllowedCategories = require DOC_ROOT . 'src/Config/App/scripts/leadsAllowedCategoriesProd.php';
         return self::$leadsAllowedCategories;
     }
 

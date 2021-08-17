@@ -28,7 +28,8 @@
     "psr-4": {
       "Application\\": "src/Application",
       "Config\\": "src/Config",
-      "Tools\\": "src/Tools"
+      "Tools\\": "src/Tools",
+      "Math\\": "src/Math"
     }
   },
   "repositories": [

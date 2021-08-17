@@ -4,6 +4,7 @@ namespace Application;
 
 use Config\IAppConfig;
 use LeadGenerator\{Generator, Lead};
+use Throwable;
 use Tools\WorkersPoolParallel\Pool;
 
 class App
@@ -27,20 +28,46 @@ class App
     public static function run()
     {
         self::$leadGenerator->generateLeads(self::$leadsCount, function (Lead $lead) {
-            $allowedLeadsCategories = self::$config::getLeadsAllowedCategories();
-            if (in_array($lead->categoryName, $allowedLeadsCategories)) {
-                $task = function ($workerId, Lead $lead) {
 
-                    sleep(2);
-                    file_put_contents(
+            $task = function ($workerId, Lead $lead, $getArrayOfLeadsAllowedCategoriesMethod) {
+                try {
+                    $leadsAllowedCategories = call_user_func($getArrayOfLeadsAllowedCategoriesMethod);
+                } catch (Throwable $e) {
+                    $msg = date('Y-m-d H:i:s ') . "ERROR: worker (id: {$workerId}) can not get leads allowed"
+                        . " categories to handle lead (id: {$lead->id}): {$e->getMessage()}. Skipping the lead handling.";
+                    echo $msg . PHP_EOL; // print message to console and return the same with 'code' and 'success' keys
+                    return [
+                        'success' => FALSE,
+                        'code' => 1,
+                        'message' => $msg
+                    ];
+                }
+
+                if (in_array($lead->categoryName, $leadsAllowedCategories)) {
+                    sleep(2); // simulating hard working (processing lead)..
+                    if (file_put_contents(
                         "log.txt",
                         "{$lead->id} | {$lead->categoryName} | " . date('Y-m-d H:i:s') . PHP_EOL,
                         FILE_APPEND
-                    );
-                };
-                return self::$workersPool->run($task, [$lead]);
-            }
-            return FALSE;
+                    )) {
+                        return ['success' => TRUE];
+                    } else {
+                        // error writing to file
+                        $msg = date('Y-m-d H:i:s ') . "ERROR: worker (id: {$workerId}) can not write write "
+                            ." result of handling lead (id: {$lead->id}) to file.";
+                        echo $msg . PHP_EOL;
+                        return [
+                            'success' => FALSE,
+                            'code' => 2,
+                            'message' => $msg
+                        ];
+                    }
+                } else {
+                    // lead is from not allowed category
+                    return ['success' => TRUE];
+                }
+            };
+            return self::$workersPool->run($task, [$lead, get_class(self::$config) . '::getLeadsAllowedCategories']);
         });
 
         self::$workersPool->waitAllTasksComplete();
@@ -48,7 +75,7 @@ class App
 
     public static function reinitialize(IAppConfig $config)
     {
-        self::$workersPool->stop(); # дождёмся, когда воркеры выполнят оставшиеся задачи и остановим пул
+        self::$workersPool->stop(); # wait, when all past tasks will be done and stop the pool
         self::initialize($config);
     }
 }

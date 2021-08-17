@@ -27,14 +27,14 @@ class Pool
 
     public function run(callable $task, $arguments = [])
     {
-        // даём свободному воркеру задачу
+        // give task for free worker
         foreach ($this->workers as $worker) {
             if (!$worker->isBusy()) {
                 return $worker->run($task, $arguments);
             }
         }
 
-        // а если нет свободного, то раздаём задачи по порядку
+        // if there is no free - give by sequence
         $i = $this->workerIndex++ % $this->size;
         return $this->workers[$i]->run($task, $arguments);
     }
